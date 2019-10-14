@@ -16,7 +16,7 @@ namespace DancingGoat.Tests.Unit
         private const string PARTIAL_VIEW_NAME = "Widgets/_TextWidget";
         private const string TEXT = "Sample text";
 
-        private readonly IWidgetPropertiesRetriever<TextWidgetProperties> propertiesRetriever = Substitute.For<IWidgetPropertiesRetriever<TextWidgetProperties>>();
+        private readonly IComponentPropertiesRetriever<TextWidgetProperties> propertiesRetriever = Substitute.For<IComponentPropertiesRetriever<TextWidgetProperties>>();
 
 
         [Test]

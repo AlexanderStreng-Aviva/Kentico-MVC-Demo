@@ -28,7 +28,7 @@ namespace DancingGoat.Controllers.Widgets
         /// <param name="propertiesRetriever">Retriever for widget properties.</param>
         /// <param name="currentPageRetriever">Retriever for current page where is the widget used.</param>
         /// <remarks>Use this constructor for tests to handle dependencies.</remarks>
-        public HeroImageWidgetController(IWidgetPropertiesRetriever<HeroImageWidgetProperties> propertiesRetriever,
+        public HeroImageWidgetController(IComponentPropertiesRetriever<HeroImageWidgetProperties> propertiesRetriever,
                                         ICurrentPageRetriever currentPageRetriever) : base(propertiesRetriever, currentPageRetriever)
         {
         }

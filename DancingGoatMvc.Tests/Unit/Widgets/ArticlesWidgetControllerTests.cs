@@ -26,7 +26,7 @@ namespace DancingGoat.Tests.Unit
         private const int CURRENT_ARTICLES_COUNT = 2;
         private const int REQUIRED_ARTICLES_COUNT = 5;
 
-        private readonly IWidgetPropertiesRetriever<ArticlesWidgetProperties> propertiesRetriever = Substitute.For<IWidgetPropertiesRetriever<ArticlesWidgetProperties>>();
+        private readonly IComponentPropertiesRetriever<ArticlesWidgetProperties> propertiesRetriever = Substitute.For<IComponentPropertiesRetriever<ArticlesWidgetProperties>>();
         private readonly IArticleRepository articleRepository = Substitute.For<IArticleRepository>();
         private readonly IOutputCacheDependencies outputCacheDependencies = Substitute.For<IOutputCacheDependencies>();
 

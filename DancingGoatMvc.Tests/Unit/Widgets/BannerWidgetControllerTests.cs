@@ -26,7 +26,7 @@ namespace DancingGoat.Tests.Unit
 
         private Article page;
         private BannerWidgetController controller;
-        private readonly IWidgetPropertiesRetriever<BannerWidgetProperties> propertiesRetriever = Substitute.For<IWidgetPropertiesRetriever<BannerWidgetProperties>>();
+        private readonly IComponentPropertiesRetriever<BannerWidgetProperties> propertiesRetriever = Substitute.For<IComponentPropertiesRetriever<BannerWidgetProperties>>();
         private readonly ICurrentPageRetriever currentPageRetriever = Substitute.For<ICurrentPageRetriever>();
         private readonly Guid attachmentGuid = Guid.Parse("00000000-0000-0000-0000-000000000001");
 

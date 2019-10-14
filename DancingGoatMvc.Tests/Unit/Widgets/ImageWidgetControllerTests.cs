@@ -25,7 +25,7 @@ namespace DancingGoat.Tests.Unit
 
         private Article page;
         private ImageWidgetController controller;
-        private readonly IWidgetPropertiesRetriever<ImageWidgetProperties> propertiesRetriever = Substitute.For<IWidgetPropertiesRetriever<ImageWidgetProperties>>();
+        private readonly IComponentPropertiesRetriever<ImageWidgetProperties> propertiesRetriever = Substitute.For<IComponentPropertiesRetriever<ImageWidgetProperties>>();
         private readonly ICurrentPageRetriever currentPageRetriever = Substitute.For<ICurrentPageRetriever>();
         private readonly Guid attachmentGuid = Guid.Parse("00000000-0000-0000-0000-000000000001");
 

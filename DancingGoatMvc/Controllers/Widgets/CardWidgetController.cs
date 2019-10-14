@@ -28,7 +28,7 @@ namespace DancingGoat.Controllers.Widgets
         /// <param name="propertiesRetriever">Retriever for widget properties.</param>
         /// <param name="currentPageRetriever">Retriever for current page where is the widget used.</param>
         /// <remarks>Use this constructor for tests to handle dependencies.</remarks>
-        public CardWidgetController(IWidgetPropertiesRetriever<CardWidgetProperties> propertiesRetriever,
+        public CardWidgetController(IComponentPropertiesRetriever<CardWidgetProperties> propertiesRetriever,
                                         ICurrentPageRetriever currentPageRetriever) : base(propertiesRetriever, currentPageRetriever)
         {
         }

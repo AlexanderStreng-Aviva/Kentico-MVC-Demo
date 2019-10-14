@@ -20,8 +20,8 @@ namespace DancingGoat.Controllers.Widgets
     /// </summary>
     public class ArticlesWidgetController : WidgetController<ArticlesWidgetProperties>
     {
-        private readonly IArticleRepository mArticleRepository;
-        private readonly IOutputCacheDependencies mOutputCacheDependencies;
+        private readonly IArticleRepository _articleRepository;
+        private readonly IOutputCacheDependencies _outputCacheDependencies;
 
 
         /// <summary>
@@ -31,8 +31,8 @@ namespace DancingGoat.Controllers.Widgets
         /// <param name="outputCacheDependencies">Output cache dependency handling.</param>
         public ArticlesWidgetController(IArticleRepository repository, IOutputCacheDependencies outputCacheDependencies)
         {
-            mArticleRepository = repository;
-            mOutputCacheDependencies = outputCacheDependencies;
+            _articleRepository = repository;
+            _outputCacheDependencies = outputCacheDependencies;
         }
 
 
@@ -45,11 +45,11 @@ namespace DancingGoat.Controllers.Widgets
         /// <param name="currentPageRetriever">Retriever for current page where is the widget used.</param>
         /// <remarks>Use this constructor for tests to handle dependencies.</remarks>
         public ArticlesWidgetController(IArticleRepository repository, IOutputCacheDependencies outputCacheDependencies,
-                                        IWidgetPropertiesRetriever<ArticlesWidgetProperties> propertiesRetriever,
+                                        IComponentPropertiesRetriever<ArticlesWidgetProperties> propertiesRetriever,
                                         ICurrentPageRetriever currentPageRetriever) : base(propertiesRetriever, currentPageRetriever)
         {
-            mArticleRepository = repository;
-            mOutputCacheDependencies = outputCacheDependencies;
+            _articleRepository = repository;
+            _outputCacheDependencies = outputCacheDependencies;
         }
 
 
@@ -57,10 +57,10 @@ namespace DancingGoat.Controllers.Widgets
         public ActionResult Index()
         {
             var properties = GetProperties();
-            var widgetModels = mArticleRepository.GetArticles(properties.Count)
+            var widgetModels = _articleRepository.GetArticles(properties.Count)
                                                  .Select(ArticleViewModel.GetViewModel);
 
-            mOutputCacheDependencies.AddDependencyOnPages<Article>();
+            _outputCacheDependencies.AddDependencyOnPages<Article>();
 
             return PartialView("Widgets/_ArticlesWidget", new ArticlesWidgetViewModel { Articles = widgetModels, Count = properties.Count });
         }

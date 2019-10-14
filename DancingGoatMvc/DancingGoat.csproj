@@ -862,12 +862,15 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Views\Page\Index.cshtml" />
+    <Content Include="Views\Shared\_PageTemplateLayout.cshtml" />
+    <Content Include="Views\Shared\PageTemplates\_LandingPageTemplate.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionSelectors\ButtonNameActionAttribute.cs" />
     <Compile Include="App_Start\ApplicationConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\DependencyResolverConfig.cs" />
+    <Compile Include="App_Start\PageBuilderComponentRegister.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="CMSRegistrationSource.cs" />
@@ -989,6 +992,7 @@
     <Compile Include="Models\Coffees\CoffeeFilterViewModel.cs" />
     <Compile Include="Models\Coffees\CoffeeProductFilterCheckboxViewModel.cs" />
     <Compile Include="Models\Brewers\BrewersProductFilterCheckboxViewModel.cs" />
+    <Compile Include="Models\PageTemplates\LandingPage\LandingPageProperties.cs" />
     <Compile Include="Models\Personalization\ConditionTypes\IsInPersona\IsInPersonaListItemViewModel.cs" />
     <Compile Include="Models\Personalization\ConditionTypes\IsInPersona\IsInPersonaViewModel.cs" />
     <Compile Include="Models\Widgets\TestimonialWidget\TestimonialWidgetProperties.cs" />

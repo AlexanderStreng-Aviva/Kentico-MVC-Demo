@@ -15,8 +15,7 @@ namespace DancingGoat.Generator.WebAnalytics
         private const int VisitsVariance = 10;
         private const int VisitsGradient = 6;
 
-        public static string[] StatisticCodeNames = new string[27]
-        {
+        public static string[] StatisticCodeNames = {
             "aggviews",
             "avgtimeonpage",
             "browsertype",
@@ -270,8 +269,7 @@ namespace DancingGoat.Generator.WebAnalytics
             }
         };
 
-        private readonly string[] _mNameDataSource = new string[35]
-        {
+        private readonly string[] _mNameDataSource = {
             "Jannine Stevens",
             "Bart Christians",
             "Kacey Chambers",
@@ -527,7 +525,8 @@ namespace DancingGoat.Generator.WebAnalytics
             for (var date = dateTime2; date < dateTime1; date = date.AddDays(1.0))
             {
                 var days2 = (date - dateTime2).Days;
-                var num1 = (int) (20000.0 / days1 + Logit(random.NextDouble()) * 10.0 + (days2 - days1 / 2) * 6);
+                var num1 = (int) (TotalMonthsVisits / days1 + Logit(random.NextDouble()) * VisitsVariance +
+                                  (days2 - days1 / 2) * VisitsGradient);
                 var num2 = (int) ((0.2 + random.NextDouble() * 0.1) * num1);
                 var dictionary = new Dictionary<string, int>
                 {
@@ -545,9 +544,8 @@ namespace DancingGoat.Generator.WebAnalytics
             }
         }
 
-        private Action<DateTime, Dictionary<string, int>, Random> RegisterGenerators()
-        {
-            return (Action<DateTime, Dictionary<string, int>, Random>) Delegate.Combine(
+        private Action<DateTime, Dictionary<string, int>, Random> RegisterGenerators() =>
+            (Action<DateTime, Dictionary<string, int>, Random>) Delegate.Combine(
                 Delegate.Combine(
                     Delegate.Combine(
                         Delegate.Combine(
@@ -587,7 +585,6 @@ namespace DancingGoat.Generator.WebAnalytics
                         new Action<DateTime, Dictionary<string, int>, Random>(ScreenColors)),
                     new Action<DateTime, Dictionary<string, int>, Random>(ScreenResolution)),
                 new Action<DateTime, Dictionary<string, int>, Random>(Conversions));
-        }
 
         private void Countries(DateTime date, Dictionary<string, int> visitors, Random random)
         {
@@ -610,8 +607,10 @@ namespace DancingGoat.Generator.WebAnalytics
             var dataSourceFrequency = GetDataSourceFrequency(_mMobileDevicesDataSource);
             var num = amountOfVisitors.Sum(visitor => visitor.Value);
             foreach (var keyValuePair in _mMobileDevicesDataSource)
+            {
                 LogHit("mobiledevice", (int) (dataSourceFrequency[keyValuePair.Key] * num), 0, date, keyValuePair.Key,
                     null, 0);
+            }
         }
 
         public void UrlReferrals(DateTime date, Dictionary<string, int> visitors, Random random)
@@ -647,16 +646,20 @@ namespace DancingGoat.Generator.WebAnalytics
                 var pair = relativeAmountOfVisitor;
                 foreach (var treeNode in GetRandomDocuments(5, 3, "DancingGoatMvc.Article")
                     .Where(document => document.DocumentCulture == pair.Key))
+                {
                     LogHit("aggviews", relativeAmountOfVisitor.Value, 0, date, treeNode.NodeAliasPath,
                         treeNode.DocumentCulture, treeNode.NodeID);
+                }
             }
         }
 
         public void FileDownloads(DateTime date, Dictionary<string, int> visitors, Random random)
         {
             foreach (var relativeAmountOfVisitor in GetRelativeAmountOfVisitors(0.05, 0.001, random, visitors))
+            {
                 LogHit("filedownloads", relativeAmountOfVisitor.Value, 0, date,
                     GetRandomDataSourceValue(_mFileDownloadsDataSource, random), relativeAmountOfVisitor.Key, 0);
+            }
         }
 
         private void VisitorsAndTopLandingAndExitPages(
@@ -801,8 +804,10 @@ namespace DancingGoat.Generator.WebAnalytics
             var list = ConversionInfoProvider.GetConversions().OnSite(_mSite.SiteID).ToList();
             var num = visitors.Sum(visitor => visitor.Value) / list.Count;
             foreach (var conversionInfo in list)
+            {
                 LogHit("conversion", (int) Math.Round(0.75 * (random.NextDouble() / 2.0) * num), 0, date,
                     conversionInfo.ConversionName, null, 0);
+            }
         }
 
         private Dictionary<string, double> GetDataSourceFrequency(
@@ -822,7 +827,9 @@ namespace DancingGoat.Generator.WebAnalytics
             {
                 num3 += keyValuePair.Value;
                 if (num3 >= num2)
+                {
                     return keyValuePair.Key;
+                }
             }
 
             return null;
@@ -857,10 +864,8 @@ namespace DancingGoat.Generator.WebAnalytics
             return visitors.ToDictionary(visitor => visitor.Key, visitor => (int) ((double) visitor.Value * ratio));
         }
 
-        private int GetRandomValue(Random random, int baseValue = 5, int variance = 10)
-        {
-            return Math.Max(1, baseValue + (int) Logit(random.NextDouble()) * variance);
-        }
+        private int GetRandomValue(Random random, int baseValue = 5, int variance = 10) =>
+            Math.Max(1, baseValue + (int) Logit(random.NextDouble()) * variance);
 
         public IEnumerable<TreeNode> GetRandomDocuments(
             int numberOfEnglishDocuments,
@@ -871,7 +876,10 @@ namespace DancingGoat.Generator.WebAnalytics
             {
                 var source = DocumentHelper.GetDocuments().Culture(culture);
                 if (documentType != null)
+                {
                     source = source.Type(documentType);
+                }
+
                 return source.ToList().OrderBy(n => Guid.NewGuid()).Take(numberOfDocuments);
             });
             return func("en-US", numberOfEnglishDocuments).Union(func("es-ES", numberOfSpanishDocuments));

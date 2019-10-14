@@ -14,7 +14,7 @@ namespace DancingGoat.Generator.WebAnalytics
 
         private static void GenerateOnlineMarketingData(SiteInfo site)
         {
-            new CampaignContactsDataGenerator("GeneratedCampaignContact", "GeneratedCampaignContactLastName").Generate();
+            new CampaignContactsDataGenerator(ContactFirstNamePrefix, ContactLastNamePrefix).Generate();
             new CampaignDataGenerator(site, "GeneratedCampaignContact").Generate();
             new AbTestAndConversionDataGenerator(site).Generate();
             new OnlineMarketingDataGenerator(site).Generate();

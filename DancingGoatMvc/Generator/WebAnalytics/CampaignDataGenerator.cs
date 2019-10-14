@@ -22,10 +22,9 @@ namespace DancingGoat.Generator.WebAnalytics
         private const string PagePathColombia = "/Campaign-assets/Cafe-promotion/Colombia";
         private const string PagePathThankYou = "/Campaign-assets/Cafe-promotion/Thank-you";
 
-        private const string PagePathAmericasCoffeePoster =
-            "/Campaign-assets/Cafe-promotion/America-s-coffee-poster";
+        private const string PagePathAmericasCoffeePoster = "/Campaign-assets/Cafe-promotion/America-s-coffee-poster";
 
-        private const string PagePathCoffeeClubMembership = "/Store/Coffee-Club-Membership";
+        private const string PagePathCoffeeClubMembership = "/Products/Coffees/Ethiopia-Yirgacheffe";
         private const string TryFreeSampleFormCodeName = "TryAFreeSample";
         private const int CampaignCafeSamplePromotionFinishedContactsCount = 100;
         private const int CampaignCafeSamplePromotionRunningContactsCount = 0;
@@ -34,7 +33,7 @@ namespace DancingGoat.Generator.WebAnalytics
             _campaignCafeSamplePromotionFinishedHits = new Dictionary<string, IEnumerable<ActivityDataParameters>>
             {
                 {
-                    "Colombia",
+                    ConversionPagevisitColombia,
                     new List<ActivityDataParameters>
                     {
                         GetActivityDataParameters("colombia_coffee_sample_promotion",
@@ -50,7 +49,7 @@ namespace DancingGoat.Generator.WebAnalytics
                     }
                 },
                 {
-                    "Try a free sample",
+                    ConversionFormsubmissionTryFreeSample,
                     new List<ActivityDataParameters>
                     {
                         GetActivityDataParameters("colombia_coffee_sample_promotion",
@@ -66,7 +65,7 @@ namespace DancingGoat.Generator.WebAnalytics
                     }
                 },
                 {
-                    "America's coffee poster",
+                    ConversionPagevisitAmericasCoffeePoster,
                     new List<ActivityDataParameters>
                     {
                         GetActivityDataParameters("colombia_coffee_sample_promotion",
@@ -80,7 +79,7 @@ namespace DancingGoat.Generator.WebAnalytics
                     }
                 },
                 {
-                    "User registration",
+                    ConversionUserregistration,
                     new List<ActivityDataParameters>
                     {
                         GetActivityDataParameters("colombia_coffee_sample_promotion",
@@ -97,7 +96,7 @@ namespace DancingGoat.Generator.WebAnalytics
             _campaignCafeSamplePromotionRunningHits = new Dictionary<string, IEnumerable<ActivityDataParameters>>
             {
                 {
-                    "Colombia",
+                    ConversionPagevisitColombia,
                     new List<ActivityDataParameters>
                     {
                         GetActivityDataParameters("linkedin", "linkedin_colombia", 1429),
@@ -108,7 +107,7 @@ namespace DancingGoat.Generator.WebAnalytics
                     }
                 },
                 {
-                    "Try a free sample",
+                    ConversionFormsubmissionTryFreeSample,
                     new List<ActivityDataParameters>
                     {
                         GetActivityDataParameters("linkedin", "linkedin_colombia", 175),
@@ -119,7 +118,7 @@ namespace DancingGoat.Generator.WebAnalytics
                     }
                 },
                 {
-                    "America's coffee poster",
+                    ConversionPagevisitAmericasCoffeePoster,
                     new List<ActivityDataParameters>
                     {
                         GetActivityDataParameters("linkedin", string.Empty, 42),
@@ -130,7 +129,7 @@ namespace DancingGoat.Generator.WebAnalytics
                     }
                 },
                 {
-                    "User registration",
+                    ConversionUserregistration,
                     new List<ActivityDataParameters>
                     {
                         GetActivityDataParameters("linkedin", "linkedin_colombia", 50),
@@ -161,15 +160,13 @@ namespace DancingGoat.Generator.WebAnalytics
         private static ActivityDataParameters GetActivityDataParameters(
             string utmSource,
             string utmContent,
-            int count)
-        {
-            return new ActivityDataParameters
+            int count) =>
+            new ActivityDataParameters
             {
                 UtmSource = utmSource,
                 UtmContent = utmContent,
                 Count = count
             };
-        }
 
         public void Generate()
         {
@@ -178,12 +175,12 @@ namespace DancingGoat.Generator.WebAnalytics
                 .ForEach(CampaignInfoProvider.DeleteCampaignInfo);
             GenerateCoffeeClubMembershipCampaign();
             GenerateCafePromotionSampleCampaign();
-            GenerateCampaignObjective("DancingGoat.CafeSamplePromotion", "Try a free sample", 600);
-            GenerateCampaignObjective("DancingGoat.CafeSamplePromotionTest", "Try a free sample", 50);
-            GenerateActivities("DancingGoat.CafeSamplePromotion", _campaignCafeSamplePromotionRunningHits,
-                0);
-            GenerateActivities("DancingGoat.CafeSamplePromotionTest",
-                _campaignCafeSamplePromotionFinishedHits, 100);
+            GenerateCampaignObjective(CampaignCafeSamplePromotionRunning, ConversionFormsubmissionTryFreeSample, 600);
+            GenerateCampaignObjective(CampaignCafeSamplePromotionFinished, ConversionFormsubmissionTryFreeSample, 50);
+            GenerateActivities(CampaignCafeSamplePromotionRunning, _campaignCafeSamplePromotionRunningHits,
+                CampaignCafeSamplePromotionRunningContactsCount);
+            GenerateActivities(CampaignCafeSamplePromotionFinished,
+                _campaignCafeSamplePromotionFinishedHits, CampaignCafeSamplePromotionFinishedContactsCount);
             new CalculateCampaignConversionReportTask().Execute(new TaskInfo
             {
                 TaskSiteID = _mSite.SiteID
@@ -197,13 +194,19 @@ namespace DancingGoat.Generator.WebAnalytics
         {
             var campaignInfo = CampaignInfoProvider.GetCampaignInfo(campaignName, _mSite.SiteName);
             if (campaignInfo == null)
+            {
                 return;
+            }
+
             var campaignConversionInfo = CampaignConversionInfoProvider.GetCampaignConversions()
                 .WhereEquals("CampaignConversionDisplayName", conversionName)
                 .WhereEquals("CampaignConversionCampaignID", campaignInfo.CampaignID)
                 .FirstOrDefault();
             if (campaignConversionInfo == null)
+            {
                 return;
+            }
+
             CampaignObjectiveInfoProvider.SetCampaignObjectiveInfo(new CampaignObjectiveInfo
             {
                 CampaignObjectiveCampaignID = campaignInfo.CampaignID,
@@ -216,7 +219,10 @@ namespace DancingGoat.Generator.WebAnalytics
         {
             var siteName = _mSite.SiteName;
             if (CampaignInfoProvider.GetCampaignInfo(campaignData.CampaignName, siteName) != null)
+            {
                 return;
+            }
+
             var campaignInfo = new CampaignInfo
             {
                 CampaignName = campaignData.CampaignName,
@@ -240,16 +246,21 @@ namespace DancingGoat.Generator.WebAnalytics
             }
 
             foreach (var pagePath in campaignData.CampaignContentInventory)
+            {
                 CampaignDataGeneratorHelpers.AddPageAsset(campaignInfo.CampaignID, pagePath);
+            }
+
             foreach (var conversionData in campaignData.CampaignReportSetup)
+            {
                 CampaignDataGeneratorHelpers.CreateConversion(campaignInfo.CampaignID, conversionData);
+            }
         }
 
         private void GenerateCoffeeClubMembershipCampaign()
         {
             var campaignData = new CampaignData
             {
-                CampaignName = "DancingGoat.CoffeeClubMembership",
+                CampaignName = CampaignCoffeeClubMembershipDraft,
                 CampaignDisplayName = "Coffee club membership",
                 CampaignDescription =
                     "The goal of this campaign is to promote the Coffee Club, a new service that the Dancing Goat company provides for it's coffee geek customers.",
@@ -259,12 +270,12 @@ namespace DancingGoat.Generator.WebAnalytics
                 CampaignEmailPromotion = _newsletterCoffeeClubMembershipIssueGuid,
                 CampaignContentInventory = new List<string>
                 {
-                    "/Products/Coffees/Ethiopia-Yirgacheffe"
+                    PagePathCoffeeClubMembership
                 },
                 CampaignReportSetup = PrepareCoffeeClubMembershipConversions()
             };
             GenerateCampaign(campaignData);
-            campaignData.CampaignName = "DancingGoat.CoffeeClubMembershipTest";
+            campaignData.CampaignName = CampaignCoffeeClubMembershipScheduled;
             campaignData.CampaignDisplayName = "Coffee club membership test";
             campaignData.CampaignOpenFrom = DateTime.Now.AddDays(6.0);
             campaignData.CampaignUtmCode = "coffee_club_membership_scheduled";
@@ -275,7 +286,7 @@ namespace DancingGoat.Generator.WebAnalytics
         {
             var campaignData = new CampaignData
             {
-                CampaignName = "DancingGoat.CafeSamplePromotion",
+                CampaignName = CampaignCafeSamplePromotionRunning,
                 CampaignDisplayName = "Cafe sample promotion",
                 CampaignDescription =
                     "The goal of this campaign is to increase the number of visitors in our cafes. We want to achieve that by sending out free coffee sample coupons that customers can redeem at the cafes. At the end of the process a poster download is offered to see whether people would be interested in such freebies.",
@@ -285,14 +296,14 @@ namespace DancingGoat.Generator.WebAnalytics
                 CampaignEmailPromotion = _newsletterColombiaCoffeeSamplePromotionIssueGuid,
                 CampaignContentInventory = new List<string>
                 {
-                    "/Campaign-assets/Cafe-promotion/Colombia",
-                    "/Campaign-assets/Cafe-promotion/Thank-you",
-                    "/Campaign-assets/Cafe-promotion/America-s-coffee-poster"
+                    PagePathColombia,
+                    PagePathThankYou,
+                    PagePathAmericasCoffeePoster
                 },
                 CampaignReportSetup = PrepareCafeSamplePromotionConversions()
             };
             GenerateCampaign(campaignData);
-            campaignData.CampaignName = "DancingGoat.CafeSamplePromotionTest";
+            campaignData.CampaignName = CampaignCafeSamplePromotionFinished;
             campaignData.CampaignDisplayName = "Cafe sample promotion test";
             campaignData.CampaignOpenTo = campaignData.CampaignOpenFrom.AddDays(6.0);
             campaignData.CampaignUtmCode = "cafe_sample_promotion_finished";
@@ -307,33 +318,36 @@ namespace DancingGoat.Generator.WebAnalytics
             var siteName = _mSite.SiteName;
             var campaignInfo = CampaignInfoProvider.GetCampaignInfo(campaignName, siteName);
             var document1 =
-                CampaignDataGeneratorHelpers.GetDocument("/Campaign-assets/Cafe-promotion/America-s-coffee-poster");
-            var document2 = CampaignDataGeneratorHelpers.GetDocument("/Campaign-assets/Cafe-promotion/Colombia");
-            var bizFormInfo = BizFormInfoProvider.GetBizFormInfo("TryAFreeSample", _mSite.SiteID);
+                CampaignDataGeneratorHelpers.GetDocument(PagePathAmericasCoffeePoster);
+            var document2 = CampaignDataGeneratorHelpers.GetDocument(PagePathColombia);
+            var bizFormInfo = BizFormInfoProvider.GetBizFormInfo(TryFreeSampleFormCodeName, _mSite.SiteID);
             CampaignDataGeneratorHelpers.DeleteOldActivities(campaignInfo.CampaignUTMCode);
             var contactsIDs = new ContactsIdData(_mContactFirstNamePrefix, contactsCount);
-            CampaignDataGeneratorHelpers.GenerateActivities(conversionHits["Colombia"], campaignInfo, "pagevisit",
+            CampaignDataGeneratorHelpers.GenerateActivities(conversionHits[ConversionPagevisitColombia], campaignInfo,
+                "pagevisit",
                 contactsIDs, document2.NodeID);
-            CampaignDataGeneratorHelpers.GenerateActivities(conversionHits["America's coffee poster"], campaignInfo,
+            CampaignDataGeneratorHelpers.GenerateActivities(conversionHits[ConversionPagevisitAmericasCoffeePoster],
+                campaignInfo,
                 "pagevisit", contactsIDs, document1.NodeID);
-            CampaignDataGeneratorHelpers.GenerateActivities(conversionHits["User registration"], campaignInfo,
+            CampaignDataGeneratorHelpers.GenerateActivities(conversionHits[ConversionUserregistration], campaignInfo,
                 "userregistration", contactsIDs);
-            CampaignDataGeneratorHelpers.GenerateActivities(conversionHits["Try a free sample"], campaignInfo,
+            CampaignDataGeneratorHelpers.GenerateActivities(conversionHits[ConversionFormsubmissionTryFreeSample],
+                campaignInfo,
                 "bizformsubmit", contactsIDs, bizFormInfo.FormID);
         }
 
         private IEnumerable<CampaignConversionData> PrepareCafeSamplePromotionConversions()
         {
             var document1 =
-                CampaignDataGeneratorHelpers.GetDocument("/Campaign-assets/Cafe-promotion/America-s-coffee-poster");
-            var document2 = CampaignDataGeneratorHelpers.GetDocument("/Campaign-assets/Cafe-promotion/Colombia");
-            var bizFormInfo = BizFormInfoProvider.GetBizFormInfo("TryAFreeSample", _mSite.SiteID);
+                CampaignDataGeneratorHelpers.GetDocument(PagePathAmericasCoffeePoster);
+            var document2 = CampaignDataGeneratorHelpers.GetDocument(PagePathColombia);
+            var bizFormInfo = BizFormInfoProvider.GetBizFormInfo(TryFreeSampleFormCodeName, _mSite.SiteID);
             return new List<CampaignConversionData>
             {
                 new CampaignConversionData
                 {
                     ConversionName = "try_free_sample",
-                    ConversionDisplayName = "Try a free sample",
+                    ConversionDisplayName = ConversionFormsubmissionTryFreeSample,
                     ConversionActivityType = "bizformsubmit",
                     ConversionItemId = bizFormInfo.FormID,
                     ConversionOrder = 1,
@@ -369,7 +383,7 @@ namespace DancingGoat.Generator.WebAnalytics
                 new CampaignConversionData
                 {
                     ConversionName = "try_free_sample_1",
-                    ConversionDisplayName = "Try a free sample",
+                    ConversionDisplayName = ConversionFormsubmissionTryFreeSample,
                     ConversionActivityType = "bizformsubmit",
                     ConversionItemId = bizFormInfo.FormID,
                     ConversionOrder = 2,

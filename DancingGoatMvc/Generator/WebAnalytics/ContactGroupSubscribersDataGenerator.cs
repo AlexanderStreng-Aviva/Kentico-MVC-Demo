@@ -26,8 +26,8 @@ namespace DancingGoat.Generator.WebAnalytics
 
         private void AddContactGroupSubscribers()
         {
-            AddContactGroupSubscriber("AllContactsWithEmail", "ColombiaCoffeePromotion", _mSite.SiteName);
-            AddContactGroupSubscriber("AllChicagoContactsWithEmail", "ColombiaCoffeeSamplePromotion", _mSite.SiteName);
+            AddContactGroupSubscriber(ContactGroupAllContactsWithEmail, "ColombiaCoffeePromotion", _mSite.SiteName);
+            AddContactGroupSubscriber(ContactGroupAllChicagoContactsWithEmail, "ColombiaCoffeeSamplePromotion", _mSite.SiteName);
         }
 
         private void AddContactGroupSubscriber(
@@ -37,20 +37,27 @@ namespace DancingGoat.Generator.WebAnalytics
         {
             var contactGroupInfo = ContactGroupInfoProvider.GetContactGroupInfo(contactGroupName);
             if (contactGroupInfo == null)
+            {
                 return;
+            }
+
             var siteInfo = SiteInfoProvider.GetSiteInfo(siteName);
             var newsletterInfo = NewsletterInfoProvider.GetNewsletterInfo(newsletterName, siteInfo.SiteID);
             if (newsletterInfo == null ||
                 SubscriberInfoProvider.GetSubscriberInfo("om.contactgroup", contactGroupInfo.ContactGroupID,
                     siteInfo.SiteID) != null)
+            {
                 return;
-            var subscriber = new SubscriberInfo();
-            subscriber.SubscriberType = "om.contactgroup";
-            subscriber.SubscriberRelatedID = contactGroupInfo.ContactGroupID;
-            subscriber.SubscriberSiteID = siteInfo.SiteID;
-            subscriber.SubscriberFirstName = contactGroupInfo.ContactGroupDisplayName;
-            subscriber.SubscriberFullName =
-                string.Format("Contact group '{0}'", contactGroupInfo.ContactGroupDisplayName);
+            }
+
+            var subscriber = new SubscriberInfo
+            {
+                SubscriberType = "om.contactgroup",
+                SubscriberRelatedID = contactGroupInfo.ContactGroupID,
+                SubscriberSiteID = siteInfo.SiteID,
+                SubscriberFirstName = contactGroupInfo.ContactGroupDisplayName,
+                SubscriberFullName = string.Format("Contact group '{0}'", contactGroupInfo.ContactGroupDisplayName)
+            };
             SubscriberInfoProvider.SetSubscriberInfo(subscriber);
             SubscriberNewsletterInfoProvider.AddSubscriberToNewsletter(subscriber.SubscriberID,
                 newsletterInfo.NewsletterID, DateTime.Now, true);

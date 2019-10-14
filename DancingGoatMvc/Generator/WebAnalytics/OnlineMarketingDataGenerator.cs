@@ -53,7 +53,7 @@ namespace DancingGoat.Generator.WebAnalytics
 
         private void GenerateAnonymousContacts()
         {
-            for (var index = 0; index < 5; ++index)
+            for (var index = 0; index < NumberOfAnonymousContacts; ++index)
             {
                 var dateTime = DateTime.Now;
                 dateTime = dateTime.AddDays(-index);
@@ -83,9 +83,9 @@ namespace DancingGoat.Generator.WebAnalytics
             var contactStatus = CreateContactStatus("ProspectiveClient", "Prospective client");
             var contactGroup1 = CreateContactGroup("ProspectiveClients", "Prospective clients");
             var contactGroup2 = CreateContactGroup("ImportedContacts", "Imported contacts");
-            var contactRole1 = CreateContactRole("Owner");
-            var contactRole2 = CreateContactRole("CEO");
-            var contactRole3 = CreateContactRole("Barista");
+            var contactRole1 = CreateContactRole(OwnerContactRole);
+            var contactRole2 = CreateContactRole(CeoContactRole);
+            var contactRole3 = CreateContactRole(BaristaContactRole);
             var userId = UserInfoProvider.GetUserInfo("alex").UserID;
             var monicaKing = GenerateMonicaKing(contactStatus.ContactStatusID, userId);
             var dustinEvans = GenerateDustinEvans(contactStatus.ContactStatusID, userId);
@@ -115,8 +115,8 @@ namespace DancingGoat.Generator.WebAnalytics
             contact.ContactStateID = StateInfoProvider.GetStateInfo("NewHampshire").StateID;
             ContactInfoProvider.SetContactInfo(contact);
             GeneratePageVisitActivity(_mPartnershipDocument, contact);
-            CreateFormSubmission(_mPartnershipDocument, "TryAFreeSample", contact);
-            CreateFormSubmission(_mPartnershipDocument, "ContactUs", contact);
+            CreateFormSubmission(_mPartnershipDocument, TryFreeSampleFormCodeName, contact);
+            CreateFormSubmission(_mPartnershipDocument, ContactUsFormCodeName, contact);
         }
 
         private void GenerateStacyStewart()
@@ -124,12 +124,12 @@ namespace DancingGoat.Generator.WebAnalytics
             var contact = GenerateContact("Stacy", "Stewart", "Stacy.Stewart@localhost.local", null);
             contact.ContactCountryID = CountryInfoProvider.GetCountryInfo("Germany").CountryID;
             contact.ContactCity = "Berlin";
-            contact.ContactCampaign = "CafeSamplePromotion";
+            contact.ContactCampaign = ContactCampaign;
             contact.ContactNotes = "Contact acquired at CoffeeExpo2015";
             ContactInfoProvider.SetContactInfo(contact);
             GeneratePageVisitActivity(_mHomeDocument, contact);
             GeneratePageVisitActivity(_mPartnershipDocument, contact);
-            CreateFormSubmission(_mPartnershipDocument, "TryAFreeSample", contact);
+            CreateFormSubmission(_mPartnershipDocument, TryFreeSampleFormCodeName, contact);
         }
 
         private ContactInfo GenerateToddRay(int contactStatusId, int contactOwneruserId)
@@ -137,10 +137,10 @@ namespace DancingGoat.Generator.WebAnalytics
             var contact = GenerateContact("Todd", "Ray", "Todd.Ray@localhost.local", "(808)-289-4459");
             contact.ContactBirthday = DateTime.Today.AddYears(-42);
             contact.ContactGender = 1;
-            contact.ContactJobTitle = "Owner";
+            contact.ContactJobTitle = OwnerContactRole;
             contact.ContactStatusID = contactStatusId;
             contact.ContactMobilePhone = "+420123456789";
-            contact.ContactCampaign = "CafeSamplePromotion";
+            contact.ContactCampaign = ContactCampaign;
             contact.ContactOwnerUserID = contactOwneruserId;
             contact.ContactCity = "Brno";
             contact.ContactAddress1 = "Benesova 13";
@@ -150,7 +150,7 @@ namespace DancingGoat.Generator.WebAnalytics
             contact.ContactNotes = "Should be involved in every communication with Air Cafe.";
             ContactInfoProvider.SetContactInfo(contact);
             GeneratePageVisitActivity(_mPartnershipDocument, contact);
-            CreateFormSubmission(_mPartnershipDocument, "BusinessCustomerRegistration", contact);
+            CreateFormSubmission(_mPartnershipDocument, BusinessCustomerRegistationFormCodeName, contact);
             return contact;
         }
 
@@ -159,10 +159,10 @@ namespace DancingGoat.Generator.WebAnalytics
             var contact = GenerateContact("Dustin", "Evans", "Dustin.Evans@localhost.local", "(808)-139-4639");
             contact.ContactBirthday = DateTime.Today.AddYears(-40);
             contact.ContactGender = 1;
-            contact.ContactJobTitle = "CEO";
+            contact.ContactJobTitle = CeoContactRole;
             contact.ContactStatusID = contactStatusId;
             contact.ContactMobilePhone = "+420123456789";
-            contact.ContactCampaign = "CafeSamplePromotion";
+            contact.ContactCampaign = ContactCampaign;
             contact.ContactOwnerUserID = contactOwneruserId;
             contact.ContactNotes = "Willing to participate in the partnership program - materials sent";
             contact.ContactCity = "South Yarra";
@@ -175,7 +175,7 @@ namespace DancingGoat.Generator.WebAnalytics
             GeneratePageVisitActivity(_mHomeDocument, contact);
             GenerateInternalSearchActivity(_mHomeDocument, contact, "wholesale");
             GeneratePageVisitActivity(_mPartnershipDocument, contact);
-            CreateFormSubmission(_mPartnershipDocument, "BusinessCustomerRegistration", contact);
+            CreateFormSubmission(_mPartnershipDocument, BusinessCustomerRegistationFormCodeName, contact);
             return contact;
         }
 
@@ -184,10 +184,10 @@ namespace DancingGoat.Generator.WebAnalytics
             var contact = GenerateContact("Monica", "King", "monica.king@localhost.local", "(595)-721-1648");
             contact.ContactBirthday = DateTime.Today.AddYears(-35);
             contact.ContactGender = 2;
-            contact.ContactJobTitle = "Barista";
+            contact.ContactJobTitle = BaristaContactRole;
             contact.ContactStatusID = contactStatusId;
             contact.ContactMobilePhone = "+420123456789";
-            contact.ContactCampaign = "CafeSamplePromotion";
+            contact.ContactCampaign = ContactCampaign;
             contact.ContactOwnerUserID = contactOwneruserId;
             contact.ContactCity = "Brno";
             contact.ContactAddress1 = "New Market 187/5";
@@ -197,8 +197,8 @@ namespace DancingGoat.Generator.WebAnalytics
             contact.ContactNotes = "Should be involved in every communication with Air Cafe.";
             ContactInfoProvider.SetContactInfo(contact);
             GeneratePageVisitActivity(_mPartnershipDocument, contact);
-            CreateFormSubmission(_mPartnershipDocument, "TryAFreeSample", contact);
-            CreateFormSubmission(_mPartnershipDocument, "ContactUs", contact);
+            CreateFormSubmission(_mPartnershipDocument, TryFreeSampleFormCodeName, contact);
+            CreateFormSubmission(_mPartnershipDocument, ContactUsFormCodeName, contact);
             GeneratePurchaseActivity(20.0, contact);
             return contact;
         }
@@ -220,7 +220,10 @@ namespace DancingGoat.Generator.WebAnalytics
         {
             var contactRoleInfo = ContactRoleInfoProvider.GetContactRoleInfo(contactRoleCodeName);
             if (contactRoleInfo != null)
+            {
                 ContactRoleInfoProvider.DeleteContactRoleInfo(contactRoleInfo);
+            }
+
             var roleObj = new ContactRoleInfo();
             roleObj.ContactRoleDescription = contactRoleCodeName;
             roleObj.ContactRoleDisplayName = contactRoleCodeName;
@@ -235,7 +238,10 @@ namespace DancingGoat.Generator.WebAnalytics
         {
             var contactStatusInfo = ContactStatusInfoProvider.GetContactStatusInfo(contactStatusCodeName);
             if (contactStatusInfo != null)
+            {
                 ContactStatusInfoProvider.DeleteContactStatusInfo(contactStatusInfo);
+            }
+
             var statusObj = new ContactStatusInfo();
             statusObj.ContactStatusDescription = contactStatusDisplayName;
             statusObj.ContactStatusDisplayName = contactStatusDisplayName;
@@ -288,12 +294,14 @@ namespace DancingGoat.Generator.WebAnalytics
             BizFormItem formItem)
         {
             foreach (var field in new FormInfo(classInfo.ClassContactMapping).GetFields(true, true))
+            {
                 formItem.SetValue(field.MappedToField, contact.GetStringValue(field.Name, string.Empty));
+            }
         }
 
         private void SetFormSpecificData(string formName, ContactInfo contact, BizFormItem formItem)
         {
-            if (formName == "TryAFreeSample")
+            if (formName == TryFreeSampleFormCodeName)
             {
                 formItem.SetValue("Country",
                     CountryInfoProvider.GetCountryInfo(contact.ContactCountryID).CountryThreeLetterCode);
@@ -302,10 +310,16 @@ namespace DancingGoat.Generator.WebAnalytics
                 formItem.SetValue("State", str);
             }
 
-            if (formName == "ContactUs")
+            if (formName == ContactUsFormCodeName)
+            {
                 formItem.SetValue("UserMessage", "Message");
-            if (!(formName == "BusinessCustomerRegistration"))
+            }
+
+            if (formName != BusinessCustomerRegistationFormCodeName)
+            {
                 return;
+            }
+
             formItem.SetValue("BecomePartner", "Becoming a partner café");
         }
 
@@ -344,7 +358,10 @@ namespace DancingGoat.Generator.WebAnalytics
         {
             var contactGroupInfo = ContactGroupInfoProvider.GetContactGroupInfo(contactGroupCodeName);
             if (contactGroupInfo != null)
+            {
                 ContactGroupInfoProvider.DeleteContactGroupInfo(contactGroupInfo);
+            }
+
             var groupObj = new ContactGroupInfo();
             groupObj.ContactGroupDisplayName = contactGroupName;
             groupObj.ContactGroupName = contactGroupCodeName;
@@ -359,7 +376,10 @@ namespace DancingGoat.Generator.WebAnalytics
                 .FirstOrDefault(
                     acc => acc.AccountName == accountName);
             if (accountObj1 != null)
+            {
                 AccountInfoProvider.DeleteAccountInfo(accountObj1);
+            }
+
             var accountObj2 = new AccountInfo();
             accountObj2.AccountName = accountName;
             AccountInfoProvider.SetAccountInfo(accountObj2);
@@ -371,7 +391,10 @@ namespace DancingGoat.Generator.WebAnalytics
             var scalarResult = new ObjectQuery("ecommerce.customer").WhereEquals("CustomerFirstName", customerFirstName)
                 .Column("CustomerID").GetScalarResult<int>();
             if (scalarResult == 0)
+            {
                 return;
+            }
+
             ContactMembershipInfoProvider.SetMembershipInfo(new ContactMembershipInfo
             {
                 ContactID = contact.ContactID,

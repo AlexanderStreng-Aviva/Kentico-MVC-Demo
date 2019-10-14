@@ -17,8 +17,7 @@ namespace DancingGoat.Generator.WebAnalytics
         private const string CafeSamplePromotionCampaignName = "CafeSamplePromotion";
         private const int ConversionValue = 10;
 
-        private readonly int[] _mConversionsForBPage = new int[15]
-        {
+        private readonly int[] _mConversionsForBPage = {
             35,
             45,
             40,
@@ -36,8 +35,7 @@ namespace DancingGoat.Generator.WebAnalytics
             0
         };
 
-        private readonly int[] _mConversionsForOriginalPage = new int[15]
-        {
+        private readonly int[] _mConversionsForOriginalPage = {
             58,
             71,
             62,
@@ -55,8 +53,7 @@ namespace DancingGoat.Generator.WebAnalytics
             0
         };
 
-        private readonly int[] _mFirstConversionsForBPage = new int[15]
-        {
+        private readonly int[] _mFirstConversionsForBPage = {
             35,
             43,
             38,
@@ -74,8 +71,7 @@ namespace DancingGoat.Generator.WebAnalytics
             0
         };
 
-        private readonly int[] _mFirstConversionsForOriginalPage = new int[15]
-        {
+        private readonly int[] _mFirstConversionsForOriginalPage = {
             57,
             69,
             60,
@@ -93,8 +89,7 @@ namespace DancingGoat.Generator.WebAnalytics
             0
         };
 
-        private readonly int[] _mFirstVisitorsForBPage = new int[15]
-        {
+        private readonly int[] _mFirstVisitorsForBPage = {
             66,
             75,
             72,
@@ -112,8 +107,7 @@ namespace DancingGoat.Generator.WebAnalytics
             2
         };
 
-        private readonly int[] _mFirstVisitorsForOriginalPage = new int[15]
-        {
+        private readonly int[] _mFirstVisitorsForOriginalPage = {
             65,
             76,
             72,
@@ -131,8 +125,7 @@ namespace DancingGoat.Generator.WebAnalytics
             1
         };
 
-        private readonly int[] _mRecurringConversionsForBPage = new int[15]
-        {
+        private readonly int[] _mRecurringConversionsForBPage = {
             35,
             43,
             38,
@@ -150,8 +143,7 @@ namespace DancingGoat.Generator.WebAnalytics
             0
         };
 
-        private readonly int[] _mRecurringConversionsForOriginalPage = new int[15]
-        {
+        private readonly int[] _mRecurringConversionsForOriginalPage = {
             1,
             2,
             2,
@@ -169,8 +161,7 @@ namespace DancingGoat.Generator.WebAnalytics
             0
         };
 
-        private readonly int[] _mReturningVisitorsForBPage = new int[15]
-        {
+        private readonly int[] _mReturningVisitorsForBPage = {
             18,
             22,
             19,
@@ -188,8 +179,7 @@ namespace DancingGoat.Generator.WebAnalytics
             30
         };
 
-        private readonly int[] _mReturningVisitorsForOriginalPage = new int[15]
-        {
+        private readonly int[] _mReturningVisitorsForOriginalPage = {
             17,
             19,
             23,
@@ -223,19 +213,22 @@ namespace DancingGoat.Generator.WebAnalytics
 
         private ABTestInfo AbTest => _mAbTest ?? (_mAbTest = ABTestInfoProvider.GetABTests().TopN(1)
                                          .OnSite(_mSite.SiteID)
-                                         .WhereEquals("ABTestName", "ColombiaLandingPageA_BTest").FirstOrDefault());
+                                         .WhereEquals("ABTestName", ColombiaLandingPageAbTestName).FirstOrDefault());
 
         private ConversionInfo Conversion => _mConversion ?? (_mConversion = ConversionInfoProvider.GetConversions()
                                                  .TopN(1).OnSite(_mSite.SiteID)
-                                                 .WhereEquals("ConversionName", "CoffeeSampleOrder").FirstOrDefault());
+                                                 .WhereEquals("ConversionName", CoffeeSampleOrderConversionName).FirstOrDefault());
 
         private ABVariantInfo OriginalVariant
         {
             get
             {
                 if (_mOriginalVariant == null)
+                {
                     _mOriginalVariant = ABCachedObjects.GetVariants(AbTest)
-                        .Single(variant => variant.ABVariantName == "Original");
+                        .Single(variant => variant.ABVariantName == ColombiaLandingPageOriginalVariantName);
+                }
+
                 return _mOriginalVariant;
             }
         }
@@ -245,14 +238,17 @@ namespace DancingGoat.Generator.WebAnalytics
             get
             {
                 if (_mBVariant == null)
+                {
                     _mBVariant = ABCachedObjects.GetVariants(AbTest)
-                        .Single(variant => variant.ABVariantName == nameof(BVariant));
+                        .Single(variant => variant.ABVariantName == ColombiaLandingPageBVariantName);
+                }
+
                 return _mBVariant;
             }
         }
 
         private CampaignInfo Campaign => _mCampaign ?? (_mCampaign = CampaignInfoProvider.GetCampaigns().TopN(1)
-                                             .OnSite(_mSite.SiteID).WhereEquals("CampaignName", "CafeSamplePromotion")
+                                             .OnSite(_mSite.SiteID).WhereEquals("CampaignName", CafeSamplePromotionCampaignName)
                                              .FirstOrDefault());
 
         /// <summary>
@@ -261,7 +257,10 @@ namespace DancingGoat.Generator.WebAnalytics
         public void Generate()
         {
             if (AbTest == null || Conversion == null || Campaign == null)
+            {
                 return;
+            }
+
             var now = DateTime.Now;
             var dateTime = now.AddDays(-14.0);
             AbTest.ABTestOpenFrom = dateTime;
@@ -302,9 +301,9 @@ namespace DancingGoat.Generator.WebAnalytics
             var action = (Action<string, int[], int[]>) ((type, originalVariantData, bVariantData) =>
             {
                 LogHit(GetAbHitCodename(type, AbTest, OriginalVariant), originalVariantData[daysFromStart],
-                    originalVariantData[daysFromStart] * 10, logDate, Conversion.ConversionName);
+                    originalVariantData[daysFromStart] * ConversionValue, logDate, Conversion.ConversionName);
                 LogHit(GetAbHitCodename(type, AbTest, BVariant), bVariantData[daysFromStart],
-                    bVariantData[daysFromStart] * 10, logDate, Conversion.ConversionName);
+                    bVariantData[daysFromStart] * ConversionValue, logDate, Conversion.ConversionName);
             });
             action("absessionconversionfirst", _mFirstConversionsForOriginalPage, _mFirstConversionsForBPage);
             action("absessionconversionrecurring", _mRecurringConversionsForOriginalPage,
@@ -334,21 +333,11 @@ namespace DancingGoat.Generator.WebAnalytics
         /// <summary>
         ///     Constructs proper statistics code name for the A/B hit.
         /// </summary>
-        private string GetAbHitCodename(
-            string statisticsType,
-            ABTestInfo abTest,
-            ABVariantInfo variant)
-        {
-            return statisticsType + ";" + abTest.ABTestName + ";" + variant.ABVariantName;
-        }
+        private static string GetAbHitCodename(string statisticsType, ABTestInfo abTest, ABVariantInfo variant) =>
+            statisticsType + ";" + abTest.ABTestName + ";" + variant.ABVariantName;
 
         /// <summary>Performs logging of the hit.</summary>
-        private void LogHit(
-            string codeName,
-            int visits,
-            int value,
-            DateTime logTime,
-            string objectName)
+        private void LogHit(string codeName, int visits, int value, DateTime logTime, string objectName)
         {
             HitLogProcessor.SaveLogToDatabase(new LogRecord
             {

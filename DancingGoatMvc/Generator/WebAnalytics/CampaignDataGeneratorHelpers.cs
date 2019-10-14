@@ -28,13 +28,22 @@ namespace DancingGoat.Generator.WebAnalytics
             var nodeId = 0;
             var itemId = 0;
             if (type == "pagevisit")
+            {
                 nodeId = conversionItemId;
+            }
             else
+            {
                 itemId = conversionItemId;
+            }
+
             foreach (var activityDataParameter in activityDataParameters)
+            {
                 for (var index = 0; index < activityDataParameter.Count; ++index)
+                {
                     GenerateFakeActivity(campaign.CampaignUTMCode, type, activityDataParameter, nodeId, itemId,
                         campaign.CampaignSiteID, contactsIDs.GetNextContactId());
+                }
+            }
         }
 
         private static void GenerateFakeActivity(
@@ -68,7 +77,10 @@ namespace DancingGoat.Generator.WebAnalytics
                     .WhereEquals("CampaignConversionItemID", conversionData.ConversionItemId)
                     .WhereEquals("CampaignConversionIsFunnelStep", conversionData.ConversionIsFunnelStep).ToList()
                     .FirstOrDefault() != null)
+            {
                 return;
+            }
+
             CampaignConversionInfoProvider.SetCampaignConversionInfo(new CampaignConversionInfo
             {
                 CampaignConversionName = conversionData.ConversionName,
@@ -85,11 +97,17 @@ namespace DancingGoat.Generator.WebAnalytics
         {
             var infoByGuid = ProviderHelper.GetInfoByGuid("newsletter.issue", issueGuid, campaign.CampaignSiteID);
             if (infoByGuid == null)
+            {
                 return;
+            }
+
             var infoById = ProviderHelper.GetInfoById("newsletter.newsletter",
                 infoByGuid.GetValue("IssueNewsletterID").ToInteger(0));
             if (infoById == null)
+            {
                 return;
+            }
+
             var lowerInvariant = infoById.GetValue("NewsletterDisplayName").ToString().Replace(' ', '_')
                 .ToLowerInvariant();
             infoByGuid.SetValue("IssueUseUTM", true);
@@ -103,7 +121,10 @@ namespace DancingGoat.Generator.WebAnalytics
         {
             if (CampaignAssetInfoProvider.GetCampaignAssets().WhereEquals("CampaignAssetCampaignID", campaignId)
                     .WhereEquals("CampaignAssetAssetGuid", nodeGuid).ToList().FirstOrDefault() != null)
+            {
                 return;
+            }
+
             CampaignAssetInfoProvider.SetCampaignAssetInfo(new CampaignAssetInfo
             {
                 CampaignAssetType = "newsletter.issue",
@@ -117,7 +138,10 @@ namespace DancingGoat.Generator.WebAnalytics
             var nodeGuid = GetDocument(pagePath).NodeGUID;
             if (CampaignAssetInfoProvider.GetCampaignAssets().WhereEquals("CampaignAssetCampaignID", campaignId)
                     .WhereEquals("CampaignAssetAssetGuid", nodeGuid).ToList().FirstOrDefault() != null)
+            {
                 return;
+            }
+
             CampaignAssetInfoProvider.SetCampaignAssetInfo(new CampaignAssetInfo
             {
                 CampaignAssetType = "cms.document",
@@ -126,9 +150,7 @@ namespace DancingGoat.Generator.WebAnalytics
             });
         }
 
-        public static TreeNode GetDocument(string path)
-        {
-            return DocumentHelper.GetDocuments().All().Culture("en-US").Path(path).OnCurrentSite().ToList().First();
-        }
+        public static TreeNode GetDocument(string path) => DocumentHelper.GetDocuments().All().Culture("en-US")
+            .Path(path).OnCurrentSite().ToList().First();
     }
 }

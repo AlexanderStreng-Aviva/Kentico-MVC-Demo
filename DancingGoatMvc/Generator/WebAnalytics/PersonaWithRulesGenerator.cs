@@ -31,14 +31,14 @@ namespace DancingGoat.Generator.WebAnalytics
         {
             GenerateCoffeeGeekPersona();
             GenerateCafeOwnerPersona();
-            AssignPersonaToSkUs("Tony_The_Cafe_Owner", new string[4]
+            AssignPersonaToSkUs(PERSONA_CAFE_OWNER, new[]
             {
                 "Hario Vacuum Pot",
                 "Macap M4D",
                 "Guatemala Finca El Injerto",
                 "Nicaragua Dipilto"
             });
-            AssignPersonaToSkUs("Martina_The_Cofee_Geek", new string[4]
+            AssignPersonaToSkUs(PERSONA_COFEE_GEEK, new[]
             {
                 "Anfim Super Caimano",
                 "Espro Press",
@@ -52,13 +52,13 @@ namespace DancingGoat.Generator.WebAnalytics
 
         private void GenerateCoffeeGeekPersona()
         {
-            var personaInfo = PersonaInfoProvider.GetPersonaInfoByCodeName("Martina_The_Cofee_Geek");
+            var personaInfo = PersonaInfoProvider.GetPersonaInfoByCodeName(PERSONA_COFEE_GEEK);
             if (personaInfo == null)
             {
                 personaInfo = new PersonaInfo
                 {
                     PersonaDisplayName = "Martina, the Coffee Geek",
-                    PersonaName = "Martina_The_Cofee_Geek",
+                    PersonaName = PERSONA_COFEE_GEEK,
                     PersonaDescription =
                         "Martina is 28, she's an online entrepreneur and a foodie girl who likes to blog about her gastronomic experiences. \r\n\r\nThe preparation of her coffee has to be perfect.  She knows all the technical bits that go into the process. Not to leave things to chance, she also owns a professional espresso machine and a grinder.\r\n\r\nMartina drinks a cappuccino or a filtered coffee in the morning and then an espresso or machiato after each meal.",
                     PersonaPointsThreshold = 15,
@@ -71,12 +71,15 @@ namespace DancingGoat.Generator.WebAnalytics
             SubscribeCoffeeGeekContactGroupToEmailCampaign(personaInfo);
             var newsletterInfo = NewsletterInfoProvider.GetNewsletterInfo("DancingGoatNewsletter", _mSite.SiteID);
             if (newsletterInfo != null)
+            {
                 GenerateRule("Is subscribed to the Dancing goat newsletter", 10, personaInfo.PersonaScoreID,
                     "<condition>\r\n  <activity name=\"newslettersubscription\">\r\n    <field name=\"ActivityItemID\">\r\n      <value>" +
                     newsletterInfo.NewsletterID +
                     "</value>\r\n    </field>\r\n    <field name=\"ActivityCreated\">\r\n      <settings>\r\n        <seconddatetime>1/1/0001 12:00:00 AM</seconddatetime>\r\n      </settings>\r\n    </field>\r\n    <field name=\"ActivityURL\">\r\n      <settings>\r\n        <operator>0</operator>\r\n      </settings>\r\n    </field>\r\n    <field name=\"ActivityTitle\">\r\n      <settings>\r\n        <operator>0</operator>\r\n      </settings>\r\n    </field>\r\n    <field name=\"ActivityComment\">\r\n      <settings>\r\n        <operator>0</operator>\r\n      </settings>\r\n    </field>\r\n    <field name=\"ActivityCampaign\">\r\n      <settings>\r\n        <operator>0</operator>\r\n      </settings>\r\n    </field>\r\n    <field name=\"ActivityURLReferrer\">\r\n      <settings>\r\n        <operator>0</operator>\r\n      </settings>\r\n    </field>\r\n  </activity>\r\n  <wherecondition>(ActivityType='newslettersubscription') AND ([ActivityItemID] = " +
                     newsletterInfo.NewsletterID + ")</wherecondition>\r\n</condition>", RuleTypeEnum.Activity,
                     "newslettersubscription");
+            }
+
             GenerateRule("Downloaded the America's coffee poster file", 5, personaInfo.PersonaScoreID,
                 BuildMacroRuleCondition(
                     "<condition>\r\n  <macro>\r\n    <value>{%Rule(\"(Contact.VisitedPage(\\\"/Campaign-assets/Cafe-promotion/America-s-coffee-poster\\\", ToInt(0)))\", \"&lt;rules&gt;&lt;r pos=\\\"0\\\" par=\\\"\\\" op=\\\"and\\\" n=\\\"CMSContactHasDownloadedSpecifiedFileInLastXDays\\\" &gt;&lt;p n=\\\"_perfectum\\\"&gt;&lt;t&gt;has&lt;/t&gt;&lt;v&gt;&lt;/v&gt;&lt;r&gt;0&lt;/r&gt;&lt;d&gt;select operation&lt;/d&gt;&lt;vt&gt;text&lt;/vt&gt;&lt;tv&gt;0&lt;/tv&gt;&lt;/p&gt;&lt;p n=\\\"days\\\"&gt;&lt;t&gt;#enter days&lt;/t&gt;&lt;v&gt;0&lt;/v&gt;&lt;r&gt;0&lt;/r&gt;&lt;d&gt;enter days&lt;/d&gt;&lt;vt&gt;text&lt;/vt&gt;&lt;tv&gt;0&lt;/tv&gt;&lt;/p&gt;&lt;p n=\\\"item\\\"&gt;&lt;t&gt;/Campaign-assets/Cafe-promotion/America-s-coffee-poster&lt;/t&gt;&lt;v&gt;/Campaign-assets/Cafe-promotion/America-s-coffee-poster&lt;/v&gt;&lt;r&gt;1&lt;/r&gt;&lt;d&gt;select file&lt;/d&gt;&lt;vt&gt;text&lt;/vt&gt;&lt;tv&gt;1&lt;/tv&gt;&lt;/p&gt;&lt;/r&gt;&lt;/rules&gt;\")%}</value>\r\n  </macro>\r\n</condition>"),
@@ -93,11 +96,17 @@ namespace DancingGoat.Generator.WebAnalytics
                 NewsletterInfoProvider.GetNewsletters().WhereEquals("NewsletterName", "CoffeeClubMembership")
                     .Column("NewsletterID")).TopN(1).FirstOrDefault();
             if (issueInfo == null)
+            {
                 return;
+            }
+
             var contactGroup = CreateContactGroup(persona);
             if (IssueContactGroupInfoProvider.GetIssueContactGroupInfo(issueInfo.IssueID,
                     contactGroup.ContactGroupID) != null)
+            {
                 return;
+            }
+
             IssueContactGroupInfoProvider.SetIssueContactGroupInfo(new IssueContactGroupInfo
             {
                 IssueID = issueInfo.IssueID,
@@ -107,12 +116,15 @@ namespace DancingGoat.Generator.WebAnalytics
 
         private static ContactGroupInfo CreateContactGroup(PersonaInfo persona)
         {
-            var contactGroupInfo = ContactGroupInfoProvider.GetContactGroupInfo("IsInPersona_Martina_TheCoffeeGeek");
+            var contactGroupInfo = ContactGroupInfoProvider.GetContactGroupInfo(CoffeeGeekPersonaContactGroupName);
             if (contactGroupInfo != null)
+            {
                 ContactGroupInfoProvider.DeleteContactGroupInfo(contactGroupInfo);
+            }
+
             var groupObj = new ContactGroupInfo();
             groupObj.ContactGroupDisplayName = "Is in persona 'Martina, the Coffee Geek'";
-            groupObj.ContactGroupName = "IsInPersona_Martina_TheCoffeeGeek";
+            groupObj.ContactGroupName = CoffeeGeekPersonaContactGroupName;
             groupObj.ContactGroupEnabled = true;
             var str = MacroSecurityProcessor.AddSecurityParameters(
                 string.Format(
@@ -126,13 +138,13 @@ namespace DancingGoat.Generator.WebAnalytics
 
         private void GenerateCafeOwnerPersona()
         {
-            var infoObj = PersonaInfoProvider.GetPersonaInfoByCodeName("Tony_The_Cafe_Owner");
+            var infoObj = PersonaInfoProvider.GetPersonaInfoByCodeName(PERSONA_CAFE_OWNER);
             if (infoObj == null)
             {
                 infoObj = new PersonaInfo
                 {
                     PersonaDisplayName = "Tony, the Cafe Owner",
-                    PersonaName = "Tony_The_Cafe_Owner",
+                    PersonaName = PERSONA_CAFE_OWNER,
                     PersonaDescription =
                         "Tony has been running his own cafe for the last 7 years. He always looks at ways of improving the service he provides.\r\n\r\nHe offers coffee that he sources from several roasteries. In addition to that, he also sells brewing machines, accessories and grinders for home use.",
                     PersonaPointsThreshold = 15,
@@ -173,13 +185,11 @@ namespace DancingGoat.Generator.WebAnalytics
                 RuleTypeEnum.Attribute, "ContactEmail");
         }
 
-        private string BuildMacroRuleCondition(string macroCondition)
-        {
-            return "<condition>\r\n  <macro>\r\n    <value>" +
-                   MacroSecurityProcessor.AddSecurityParameters(macroCondition,
-                       MacroIdentityOption.FromUserInfo(UserInfoProvider.AdministratorUser), null) +
-                   "</value>\r\n  </macro>\r\n</condition>";
-        }
+        private string BuildMacroRuleCondition(string macroCondition) =>
+            "<condition>\r\n  <macro>\r\n    <value>" +
+            MacroSecurityProcessor.AddSecurityParameters(macroCondition,
+                MacroIdentityOption.FromUserInfo(UserInfoProvider.AdministratorUser), null) +
+            "</value>\r\n  </macro>\r\n</condition>";
 
         private RuleInfo GenerateRule(
             string displayName,
@@ -193,7 +203,10 @@ namespace DancingGoat.Generator.WebAnalytics
             var codeName = ValidationHelper.GetCodeName(displayName, 100);
             var ruleInfo = RuleInfoProvider.GetRules().WithCodeName(codeName).FirstOrDefault();
             if (ruleInfo != null)
+            {
                 return ruleInfo;
+            }
+
             var ruleObj = new RuleInfo
             {
                 RuleScoreID = scoreId,
@@ -213,7 +226,10 @@ namespace DancingGoat.Generator.WebAnalytics
         {
             var personaInfoByCodeName = PersonaInfoProvider.GetPersonaInfoByCodeName(personaName);
             if (personaInfoByCodeName == null)
+            {
                 return;
+            }
+
             foreach (var treeNode in DocumentHelper.GetDocuments().All().AllCultures().WhereIn("SKUName", skuNames)
                 .Columns("NodeID").OnCurrentSite())
             {
@@ -226,7 +242,9 @@ namespace DancingGoat.Generator.WebAnalytics
         {
             foreach (var score in ScoreInfoProvider.GetScores()
                 .WhereEquals("ScoreStatus", ScoreStatusEnum.RecalculationRequired).WhereTrue("ScoreBelongsToPersona"))
+            {
                 new ScoreAsyncRecalculator(score).RunAsync();
+            }
         }
 
         private void GenerateBannerPersonalizationVariantsMacrosAndEnableVariants()
@@ -241,11 +259,17 @@ namespace DancingGoat.Generator.WebAnalytics
                 personalizationVariant1.VariantEnabled || personalizationVariant2.VariantEnabled ||
                 personalizationVariant1.VariantDisplayCondition != "{%// Macro will be added by generator%}" ||
                 personalizationVariant2.VariantDisplayCondition != "{%// Macro will be added by generator%}")
+            {
                 return;
-            var personaInfoByCodeName1 = PersonaInfoProvider.GetPersonaInfoByCodeName("Tony_The_Cafe_Owner");
-            var personaInfoByCodeName2 = PersonaInfoProvider.GetPersonaInfoByCodeName("Martina_The_Cofee_Geek");
+            }
+
+            var personaInfoByCodeName1 = PersonaInfoProvider.GetPersonaInfoByCodeName(PERSONA_CAFE_OWNER);
+            var personaInfoByCodeName2 = PersonaInfoProvider.GetPersonaInfoByCodeName(PERSONA_COFEE_GEEK);
             if (personaInfoByCodeName1 == null || personaInfoByCodeName2 == null)
+            {
                 return;
+            }
+
             var identityOption = MacroIdentityOption.FromUserInfo(UserInfoProvider.AdministratorUser);
             personalizationVariant1.VariantDisplayCondition = MacroSecurityProcessor.AddSecurityParameters(
                 string.Format(
@@ -276,8 +300,8 @@ namespace DancingGoat.Generator.WebAnalytics
             var contactsWithoutPersona = 2658;
             var contactsInB2BPersona = 426;
             var contactsInB2CPersona = 1037;
-            var personaInfoByCodeName1 = PersonaInfoProvider.GetPersonaInfoByCodeName("Tony_The_Cafe_Owner");
-            var personaInfoByCodeName2 = PersonaInfoProvider.GetPersonaInfoByCodeName("Martina_The_Cofee_Geek");
+            var personaInfoByCodeName1 = PersonaInfoProvider.GetPersonaInfoByCodeName(PERSONA_CAFE_OWNER);
+            var personaInfoByCodeName2 = PersonaInfoProvider.GetPersonaInfoByCodeName(PERSONA_COFEE_GEEK);
             var now = DateTime.Now;
             var dateTime1 = now.AddDays(30.0);
             var dateTime2 = now.AddDays(-60.0);
@@ -303,15 +327,13 @@ namespace DancingGoat.Generator.WebAnalytics
         private PersonaContactHistoryInfo CreatePersonaContactHistoryInfo(
             int contactsCount,
             DateTime time,
-            int? personaId)
-        {
-            return new PersonaContactHistoryInfo
+            int? personaId) =>
+            new PersonaContactHistoryInfo
             {
                 PersonaContactHistoryContacts = contactsCount,
                 PersonaContactHistoryDate = time,
                 PersonaContactHistoryPersonaID = personaId
             };
-        }
 
         private void IncreaseContactsCount(
             DateTime time,
@@ -340,7 +362,10 @@ namespace DancingGoat.Generator.WebAnalytics
             ref int contactsInB2CPersona)
         {
             if (!(time > now.AddDays(-14.0)) || !(time < now.AddDays(-8.0)))
+            {
                 return;
+            }
+
             contactsInB2CPersona += _mRandom.Next(20, 40);
         }
 
@@ -351,7 +376,10 @@ namespace DancingGoat.Generator.WebAnalytics
             ref int contactsInB2CPersona)
         {
             if (!(time > now.AddDays(-14.0)) || !(time < now.AddDays(-11.0)))
+            {
                 return;
+            }
+
             contactsWithoutPersona += _mRandom.Next(60, 100);
             contactsInB2CPersona += _mRandom.Next(90, 150);
         }
@@ -364,7 +392,10 @@ namespace DancingGoat.Generator.WebAnalytics
             ref int contactsInB2CPersona)
         {
             if (!(time.Date > now.Date.AddDays(-45.0)) || !(time.Date <= now.Date.AddDays(-44.0)))
+            {
                 return;
+            }
+
             contactsWithoutPersona -= 235;
             contactsInB2BPersona -= sbyte.MaxValue;
             contactsInB2CPersona += 382;

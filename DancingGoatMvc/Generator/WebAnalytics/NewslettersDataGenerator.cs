@@ -12,15 +12,12 @@ namespace DancingGoat.Generator.WebAnalytics
 {
     public class NewslettersDataGenerator
     {
-        public const string NEWSLETTER_COLOMBIA_COFFEE_PROMOTION = "ColombiaCoffeePromotion";
-        public const string NEWSLETTER_COLOMBIA_COFFEE_PROMOTION_SAMPLE = "ColombiaCoffeeSamplePromotion";
         public const string NEWSLETTER_COFFEE_CLUB_MEMBERSHIP = "CoffeeClubMembership";
         private const string EmailCampaignContactGroup = "CoffeeClubMembershipRecipients";
         private readonly NewsletterActivityGenerator _mNewsletterActivityGenerator = new NewsletterActivityGenerator();
         private readonly SiteInfo _mSite;
 
-        private readonly string[] _mSubscriberNames = new string[100]
-        {
+        private readonly string[] _mSubscriberNames = {
             "Deneen Fernald",
             "Antonio Buker",
             "Marlon Loos",
@@ -167,7 +164,10 @@ namespace DancingGoat.Generator.WebAnalytics
         {
             var newsletterInfo = NewsletterInfoProvider.GetNewsletterInfo("Coffee101", _mSite.SiteID);
             if (newsletterInfo == null)
+            {
                 return;
+            }
+
             var subscribers = GenerateSubscribers();
             AssignAllSubscribersToNewsletter(subscribers, newsletterInfo.NewsletterID);
             AdjustExistingIssues(subscribers);
@@ -197,7 +197,10 @@ namespace DancingGoat.Generator.WebAnalytics
         {
             var subscriberByEmail = SubscriberInfoProvider.GetSubscriberByEmail(email, _mSite.SiteID);
             if (subscriberByEmail != null)
+            {
                 return subscriberByEmail;
+            }
+
             var subscriber = new SubscriberInfo
             {
                 SubscriberEmail = email,
@@ -230,7 +233,9 @@ namespace DancingGoat.Generator.WebAnalytics
             int newsletterId)
         {
             foreach (var subscriber in subscribers)
+            {
                 AssignSubscriberToNewsletter(newsletterId, subscriber);
+            }
         }
 
         private void AssignSubscriberToNewsletter(int newsletterId, SubscriberInfo subscriber)
@@ -253,7 +258,10 @@ namespace DancingGoat.Generator.WebAnalytics
             var issue3 = IssueInfoProvider.GetIssues().OnSite(_mSite.SiteID)
                 .WhereEquals("IssueSubject", "Get a free Colombia coffee sample today").FirstOrDefault();
             if (issue1 == null || issue2 == null || issue3 == null)
+            {
                 return;
+            }
+
             SettingsKeyInfoProvider.SetValue("CMSMonitorBouncedEmails", _mSite.SiteName, true);
             issue1.IssueSentEmails = 98;
             issue1.IssueBounces = 2;
@@ -337,7 +345,9 @@ namespace DancingGoat.Generator.WebAnalytics
             IList<SubscriberInfo> subscribers)
         {
             for (var index = 0; index < unsubscribed; ++index)
+            {
                 CreateUnsubscription(issueId, newsletterId, subscribers[index].SubscriberEmail);
+            }
         }
 
         private void CreateUnsubscription(int issueId, int newsletterId, string unsubscriptionEmail)
@@ -358,8 +368,8 @@ namespace DancingGoat.Generator.WebAnalytics
 
         private void GenerateEmailCampaignSubscribers()
         {
-            var contactGroupInfo = ContactGroupInfoProvider.GetContactGroupInfo("CoffeeClubMembershipRecipients");
-            var newsletter = NewsletterInfoProvider.GetNewsletterInfo("CoffeeClubMembership", _mSite.SiteID);
+            var contactGroupInfo = ContactGroupInfoProvider.GetContactGroupInfo(EmailCampaignContactGroup);
+            var newsletter = NewsletterInfoProvider.GetNewsletterInfo(NEWSLETTER_COFFEE_CLUB_MEMBERSHIP, _mSite.SiteID);
             SubscribeContactGroupToIssue(
                 IssueInfoProvider.GetIssues().First(issue => issue.IssueNewsletterID == newsletter.NewsletterID),
                 contactGroupInfo);
@@ -380,13 +390,17 @@ namespace DancingGoat.Generator.WebAnalytics
         private void AddContactsToSubscribedContactGroup(ContactGroupInfo contactGroup)
         {
             for (var index = 0; index < _mSubscriberNames.Length; ++index)
+            {
                 if (index % 2 == 0)
                 {
                     var fromFullName = SubscriberData.CreateFromFullName(_mSubscriberNames[index]);
                     AddContactToContactGroup(ContactInfoProvider.GetContactInfo(fromFullName.Email), contactGroup);
                     if (index % 10 == 0)
+                    {
                         CreateGlobalUnsubscription(fromFullName.Email);
+                    }
                 }
+            }
         }
 
         private void CreateGlobalUnsubscription(string unsubscriptionEmail)
@@ -421,7 +435,7 @@ namespace DancingGoat.Generator.WebAnalytics
                 var strArray = fullName.Trim().Split(' ');
                 var str1 = strArray[0];
                 var str2 = strArray[1];
-                var str3 = string.Format("{0}@{1}.local", str1.ToLowerInvariant(), str2.ToLowerInvariant());
+                var str3 = $"{str1.ToLowerInvariant()}@{str2.ToLowerInvariant()}.local";
                 return new SubscriberData
                 {
                     FirstName = str1,

@@ -1,0 +1,38 @@
+﻿@model DancingGoat.Models.Generator.IndexViewModel
+@{
+    ViewBag.Title = ResHelper.GetString("DancingGoatMvc.Generator");
+}
+
+<h1>Generate sample data</h1>
+<p>
+    To enable a demonstration of content personalization, the generator creates sample persona and contact group data. The generator does not overwrite your custom data.
+</p>
+
+@if (Model.DisplayDevelopmentErrorMessage)
+{
+    <span class="error-label">Sample data generation is not allowed in development mode.</span>
+}
+
+@if (Model.DisplaySuccessMessage)
+{
+    <span class="info-label">Generating data finished successfully.</span>
+}
+
+@if (Model.DisplayAccessDeniedError)
+{
+    <span class="error-label">You have insufficient permission to execute this action.</span>
+}
+
+@if (Model.DisplayErrorMessage)
+{
+    <span class="error-label">Sample data generation is not allowed in development mode.</span>
+}
+
+
+@using (Html.BeginForm("Generate", "Generator"))
+{
+    @Html.AntiForgeryToken()
+    <div class="form-group">
+        <input type="submit" value="Generate" class="btn @(Model.DisplayDevelopmentErrorMessage || Model.DisplayAccessDeniedError ? "btn-disabled" : "btn-primary")" @(Model.DisplayDevelopmentErrorMessage || Model.DisplayAccessDeniedError ? "disabled='disabled'" : "") />
+    </div>
+}

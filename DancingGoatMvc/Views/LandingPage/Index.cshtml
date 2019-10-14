@@ -1,0 +1,51 @@
+﻿@using Kentico.Forms.Web.Mvc.Widgets
+
+@{
+    Layout = "";
+}
+<!DOCTYPE html>
+
+<html>
+<head id="head">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    <title>@ResHelper.GetString("DancingGoatMvc.LandingPage") - Dancing Goat</title>
+    <link rel="icon" href="@Url.Content("~/content/images/favicon.png")" type="image/png" />
+    <link href="@Url.Content("~/Content/Styles/Landing-page.css")" rel="stylesheet" type="text/css" />
+    @Html.Kentico().PageBuilderStyles()
+</head>
+<body>
+    <div class="page-wrap">
+        <header class="header">
+            <div class="stripe"> </div>
+            <div class="header-row">
+                <div class="container">
+                    <div class="col-xs-8 col-md-8 col-lg-4 logo">
+                        <h1 class="logo">Dancing Goat</h1>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div class="container content-wrapper">
+            @Html.Kentico().EditableArea("top", allowedWidgets: AreaRestrictionHelper.GetLandingPageRestrictions())
+        </div>
+        <div class="container content-wrapper bottom" id="bottom-area">
+            @Html.Kentico().EditableArea("bottom", allowedWidgets: new[] { "DancingGoat.General.TextWidget", KenticoFormWidgetController.WIDGET_IDENTIFIER })
+        </div>
+    </div>
+    <div class="footer-wrapper">
+        <footer>
+            <div class="footer-container">
+                <div class="container">
+                    Copyright &copy; @DateTime.Now.Year Dancing Goat. All rights reserved.
+                </div>
+            </div>
+        </footer>
+    </div>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jquery-unobtrusive-ajax")
+    @Scripts.Render("~/bundles/jquery-validation")
+    @Html.Kentico().PageBuilderScripts()
+    @Scripts.Render(Url.RouteUrl("KenticoLogActivityScript"))
+</body>
+</html>

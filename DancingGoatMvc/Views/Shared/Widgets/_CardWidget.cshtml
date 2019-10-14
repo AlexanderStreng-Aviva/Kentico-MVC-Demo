@@ -1,0 +1,41 @@
+﻿@using DancingGoat.Models.InlineEditors
+@using DancingGoat.Models.Widgets
+@model DancingGoat.Models.Widgets.CardWidgetViewModel
+
+@{
+    string styleAttribute = null;
+    if (Model.Image != null)
+    {
+        styleAttribute = $"style=\"background-image: url('{Url.Content(Model.Image.GetPath())}');\"";
+    }
+}
+
+@if (Context.Kentico().PageBuilder().EditMode)
+{
+    Html.RenderPartial("InlineEditors/_ImageUploaderEditor", new ImageUploaderEditorViewModel
+    {
+        PropertyName = nameof(CardWidgetProperties.ImageGuid),
+        Image = Model.Image,
+        MessagePosition = PanelPositionEnum.Top,
+        UseAbsolutePosition = true
+    });
+}
+<div class="card-body">
+    <section class="card-section" @Html.Raw(styleAttribute)>
+        <div class="card-text">
+            @if (Context.Kentico().PageBuilder().EditMode)
+            {
+                Html.RenderPartial("InlineEditors/_TextEditor", new TextEditorViewModel
+                {
+                    PropertyName = nameof(CardWidgetProperties.Text),
+                    Text = Model.Text,
+                    EnableFormatting = false
+                });
+            }
+            else
+            {
+                @Html.Raw(Model.Text)
+            }
+        </div>
+    </section>
+</div>

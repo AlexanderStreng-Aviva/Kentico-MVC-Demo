@@ -1,0 +1,41 @@
+﻿@using DancingGoat.Models.InlineEditors
+@using DancingGoat.Models.Widgets
+@model DancingGoat.Models.Widgets.BannerWidgetViewModel
+
+@{
+    string styleAttribute = null;
+    if (Model.Image != null)
+    {
+        styleAttribute = $"style=\"background-image: url('{Url.Content(Model.Image.GetPath())}');\"";
+    }
+}
+
+@if (Context.Kentico().PageBuilder().EditMode)
+{
+    Html.RenderPartial("InlineEditors/_ImageUploaderEditor", new ImageUploaderEditorViewModel
+    {
+        PropertyName = nameof(BannerWidgetProperties.ImageGuid),
+        Image = Model.Image,
+        MessagePosition = PanelPositionEnum.Top,
+        UseAbsolutePosition = true
+    });
+}
+
+<section class="banner-section" @Html.Raw(styleAttribute)>
+    <h2 class="banner-heading">@ResHelper.GetString("DancingGoatMvc.Widget.Banner.Heading")</h2>
+    <div class="banner-text">
+        @if (Context.Kentico().PageBuilder().EditMode)
+        {
+            Html.RenderPartial("InlineEditors/_TextEditor", new TextEditorViewModel
+            {
+                PropertyName = nameof(BannerWidgetProperties.Text),
+                Text = Model.Text,
+                EnableFormatting = false
+            });
+        }
+        else
+        {
+            @Html.Raw(Model.Text)
+        }
+    </div>
+</section>

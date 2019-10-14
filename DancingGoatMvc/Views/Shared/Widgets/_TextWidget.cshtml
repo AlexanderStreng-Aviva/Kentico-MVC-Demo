@@ -1,0 +1,16 @@
+﻿@using DancingGoat.Models.InlineEditors
+@using DancingGoat.Models.Widgets
+@model DancingGoat.Models.Widgets.TextWidgetViewModel
+
+@if (Context.Kentico().PageBuilder().EditMode)
+{
+    Html.RenderPartial("InlineEditors/_TextEditor", new TextEditorViewModel
+    {
+        PropertyName = nameof(TextWidgetProperties.Text),
+        Text = Model.Text
+    });
+}
+else
+{
+    @Html.Raw(Model.Text);
+}

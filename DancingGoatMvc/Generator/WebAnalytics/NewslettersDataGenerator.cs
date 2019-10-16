@@ -152,7 +152,7 @@ namespace DancingGoat.Generator.WebAnalytics
             var contactInfo = ContactInfoProvider.GetContactInfo(contactEmail);
             var newsletterInfo =
                 NewsletterInfoProvider.GetNewsletterInfo(newsletterCodeName, SiteContext.CurrentSiteID);
-            var fullName = string.Format("{0} {1}", contactInfo.ContactFirstName, contactInfo.ContactLastName);
+            var fullName = $"{contactInfo.ContactFirstName} {contactInfo.ContactLastName}";
             var subscriber = CreateSubscriber(contactInfo.ContactEmail, contactInfo.ContactFirstName,
                 contactInfo.ContactLastName, fullName, contactInfo);
             AssignSubscriberToNewsletter(newsletterInfo.NewsletterID, subscriber);
@@ -176,7 +176,7 @@ namespace DancingGoat.Generator.WebAnalytics
         private IList<SubscriberInfo> GenerateSubscribers()
         {
             var subscriberInfoList = new List<SubscriberInfo>();
-            for (var index = 0; index < _mSubscriberNames.Count(); ++index)
+            for (var index = 0; index < _mSubscriberNames.Length; ++index)
             {
                 var fromFullName = SubscriberData.CreateFromFullName(_mSubscriberNames[index]);
                 var contact = CreateContact(fromFullName.FirstName, fromFullName.LastName, fromFullName.Email);

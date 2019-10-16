@@ -288,10 +288,10 @@ namespace DancingGoat.Generator.WebAnalytics
             formItem.Insert();
         }
 
-        private void CopyDataFromContactToForm(
-            ContactInfo contact,
+        private static void CopyDataFromContactToForm(
+            BaseInfo contact,
             DataClassInfo classInfo,
-            BizFormItem formItem)
+            ISearchable formItem)
         {
             foreach (var field in new FormInfo(classInfo.ClassContactMapping).GetFields(true, true))
             {
@@ -335,6 +335,7 @@ namespace DancingGoat.Generator.WebAnalytics
             {
                 ActivityTitle = activityTitleBuilder.CreateTitle("purchase", "$" + spent),
                 ActivityValue = spent.ToString(CultureHelper.EnglishCulture),
+                //ActivityURL = "/",
                 ActivityItemID = 0,
                 ActivityType = "purchase",
                 ActivitySiteID = _mSiteInfo.SiteID,

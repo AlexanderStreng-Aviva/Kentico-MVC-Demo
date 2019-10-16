@@ -40,8 +40,7 @@ namespace DancingGoat.Generator.WebAnalytics
             {
                 for (var index = 0; index < activityDataParameter.Count; ++index)
                 {
-                    GenerateFakeActivity(campaign.CampaignUTMCode, type, activityDataParameter, nodeId, itemId,
-                        campaign.CampaignSiteID, contactsIDs.GetNextContactId());
+                    GenerateFakeActivity(campaign.CampaignUTMCode, type, activityDataParameter, nodeId, itemId, campaign.CampaignSiteID, contactsIDs.GetNextContactId());
                 }
             }
         }
@@ -59,8 +58,10 @@ namespace DancingGoat.Generator.WebAnalytics
             {
                 ActivitySiteID = siteId,
                 ActivityContactID = contactId,
+                ActivityCulture = "en-US",
                 ActivityCampaign = campaignUtMcode,
                 ActivityType = type,
+                //ActivityURL = string.IsNullOrEmpty(activityUrl) ? "/" : activityUrl,
                 ActivityNodeID = nodeId,
                 ActivityItemID = itemId,
                 ActivityUTMSource = activityDataParameter.UtmSource,
@@ -89,7 +90,8 @@ namespace DancingGoat.Generator.WebAnalytics
                 CampaignConversionActivityType = conversionData.ConversionActivityType,
                 CampaignConversionItemID = conversionData.ConversionItemId.GetValueOrDefault(),
                 CampaignConversionIsFunnelStep = conversionData.ConversionIsFunnelStep,
-                CampaignConversionOrder = conversionData.ConversionOrder
+                CampaignConversionOrder = conversionData.ConversionOrder,
+                CampaignConversionURL = "/"
             });
         }
 

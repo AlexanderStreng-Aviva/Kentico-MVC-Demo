@@ -9,11 +9,12 @@ namespace DancingGoat.Generator.WebAnalytics
         private readonly int _mContactsCount;
         private int _mCurrectContact;
 
-        public ContactsIdData(string firstNamePrefix, int contactsCount)
+        public ContactsIdData(string emailPostFix, int contactsCount)
         {
             _mContactIDs = new ObjectQuery("om.contact").Column("ContactID")
-                .WhereStartsWith("ContactFirstName", firstNamePrefix).TopN(contactsCount).GetListResult<int>()
+                .WhereEndsWith("ContactEmail", emailPostFix).TopN(contactsCount).GetListResult<int>()
                 .ToArray();
+
             _mCurrectContact = 0;
             _mContactsCount = _mContactIDs.Length;
         }

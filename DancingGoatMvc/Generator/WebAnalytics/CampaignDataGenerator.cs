@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CMS.Core;
 using CMS.DataEngine;
 using CMS.OnlineForms;
 using CMS.Scheduler;
@@ -24,10 +25,11 @@ namespace DancingGoat.Generator.WebAnalytics
 
         private const string PagePathAmericasCoffeePoster = "/Campaign-assets/Cafe-promotion/America-s-coffee-poster";
 
-        private const string PagePathCoffeeClubMembership = "/Products/Coffees/Ethiopia-Yirgacheffe";
+        private const string PagePathCoffeeClubMembership = "/Campaign-assets/Cafe-promotion/Coffee-Club-Membership";
         private const string TryFreeSampleFormCodeName = "TryAFreeSample";
-        private const int CampaignCafeSamplePromotionFinishedContactsCount = 100;
-        private const int CampaignCafeSamplePromotionRunningContactsCount = 0;
+
+        private const int CampaignCafeSamplePromotionFinishedContactsCount = 1000;
+        private const int CampaignCafeSamplePromotionRunningContactsCount = 500;
 
         private readonly Dictionary<string, IEnumerable<ActivityDataParameters>>
             _campaignCafeSamplePromotionFinishedHits = new Dictionary<string, IEnumerable<ActivityDataParameters>>
@@ -36,12 +38,9 @@ namespace DancingGoat.Generator.WebAnalytics
                     ConversionPagevisitColombia,
                     new List<ActivityDataParameters>
                     {
-                        GetActivityDataParameters("colombia_coffee_sample_promotion",
-                            string.Empty, 7),
-                        GetActivityDataParameters("colombia_coffee_sample_promotion",
-                            "colombia_mail_1", 13),
-                        GetActivityDataParameters("colombia_coffee_sample_promotion",
-                            "colombia_mail_2", 16),
+                        GetActivityDataParameters("colombia_coffee_sample_promotion",string.Empty, 7),
+                        GetActivityDataParameters("colombia_coffee_sample_promotion","colombia_mail_1", 13),
+                        GetActivityDataParameters("colombia_coffee_sample_promotion","colombia_mail_2", 16),
                         GetActivityDataParameters("facebook", "fb_colombia", 30),
                         GetActivityDataParameters("twitter", string.Empty, 4),
                         GetActivityDataParameters("twitter", "twitter_post_1", 42),
@@ -52,12 +51,9 @@ namespace DancingGoat.Generator.WebAnalytics
                     ConversionFormsubmissionTryFreeSample,
                     new List<ActivityDataParameters>
                     {
-                        GetActivityDataParameters("colombia_coffee_sample_promotion",
-                            string.Empty, 5),
-                        GetActivityDataParameters("colombia_coffee_sample_promotion",
-                            "colombia_mail_1", 11),
-                        GetActivityDataParameters("colombia_coffee_sample_promotion",
-                            "colombia_mail_2", 15),
+                        GetActivityDataParameters("colombia_coffee_sample_promotion",string.Empty, 5),
+                        GetActivityDataParameters("colombia_coffee_sample_promotion","colombia_mail_1", 11),
+                        GetActivityDataParameters("colombia_coffee_sample_promotion","colombia_mail_2", 15),
                         GetActivityDataParameters("facebook", string.Empty, 4),
                         GetActivityDataParameters("facebook", "fb_colombia", 21),
                         GetActivityDataParameters("twitter", "twitter_post_1", 9),
@@ -141,20 +137,20 @@ namespace DancingGoat.Generator.WebAnalytics
                 }
             };
 
-        private readonly string _mContactFirstNamePrefix;
+        private readonly string _contactEmailPostfix;
 
         private readonly SiteInfo _mSite;
 
         private readonly Guid _newsletterCoffeeClubMembershipIssueGuid =
-            Guid.Parse("5045B325-F360-4536-8692-9454FA91EBAA");
+            Guid.Parse("ADCFDF3E-3AA3-4228-8627-5B29EEA018DB");
 
         private readonly Guid _newsletterColombiaCoffeeSamplePromotionIssueGuid =
-            Guid.Parse("C818B404-0488-4558-B438-08167DE75824");
+            Guid.Parse("985750F8-A8E0-4704-800E-3CCD1198BEA7");
 
-        public CampaignDataGenerator(SiteInfo site, string contactFirstNamePrefix)
+        public CampaignDataGenerator(SiteInfo site, string contactEmailPostfix)
         {
             _mSite = site;
-            _mContactFirstNamePrefix = contactFirstNamePrefix;
+            _contactEmailPostfix = contactEmailPostfix;
         }
 
         private static ActivityDataParameters GetActivityDataParameters(
@@ -173,20 +169,27 @@ namespace DancingGoat.Generator.WebAnalytics
             CampaignInfoProvider.GetCampaigns().WhereStartsWith("CampaignName", "DancingGoat.")
                 .OnSite(_mSite.SiteID).ToList()
                 .ForEach(CampaignInfoProvider.DeleteCampaignInfo);
+
             GenerateCoffeeClubMembershipCampaign();
             GenerateCafePromotionSampleCampaign();
+
             GenerateCampaignObjective(CampaignCafeSamplePromotionRunning, ConversionFormsubmissionTryFreeSample, 600);
             GenerateCampaignObjective(CampaignCafeSamplePromotionFinished, ConversionFormsubmissionTryFreeSample, 50);
-            GenerateActivities(CampaignCafeSamplePromotionRunning, _campaignCafeSamplePromotionRunningHits,
-                CampaignCafeSamplePromotionRunningContactsCount);
-            GenerateActivities(CampaignCafeSamplePromotionFinished,
-                _campaignCafeSamplePromotionFinishedHits, CampaignCafeSamplePromotionFinishedContactsCount);
-            new CalculateCampaignConversionReportTask().Execute(new TaskInfo
+
+            GenerateActivities(CampaignCafeSamplePromotionRunning, _campaignCafeSamplePromotionRunningHits, CampaignCafeSamplePromotionRunningContactsCount);
+            GenerateActivities(CampaignCafeSamplePromotionFinished, _campaignCafeSamplePromotionFinishedHits, CampaignCafeSamplePromotionFinishedContactsCount);
+            
+            var result = new CalculateCampaignConversionReportTask().Execute(new TaskInfo
             {
                 TaskSiteID = _mSite.SiteID
             });
-        }
 
+            if (!string.IsNullOrEmpty(result))
+            {
+                throw new InvalidOperationException($"Exception message: '{result}'");
+            }
+        }
+        
         private void GenerateCampaignObjective(
             string campaignName,
             string conversionName,
@@ -312,25 +315,28 @@ namespace DancingGoat.Generator.WebAnalytics
 
         private void GenerateActivities(
             string campaignName,
-            Dictionary<string, IEnumerable<ActivityDataParameters>> conversionHits,
+            IReadOnlyDictionary<string, IEnumerable<ActivityDataParameters>> conversionHits,
             int contactsCount)
         {
             var siteName = _mSite.SiteName;
             var campaignInfo = CampaignInfoProvider.GetCampaignInfo(campaignName, siteName);
-            var document1 =
-                CampaignDataGeneratorHelpers.GetDocument(PagePathAmericasCoffeePoster);
-            var document2 = CampaignDataGeneratorHelpers.GetDocument(PagePathColombia);
+            var posterPath = CampaignDataGeneratorHelpers.GetDocument(PagePathAmericasCoffeePoster);
+            var colombiaPath = CampaignDataGeneratorHelpers.GetDocument(PagePathColombia);
             var bizFormInfo = BizFormInfoProvider.GetBizFormInfo(TryFreeSampleFormCodeName, _mSite.SiteID);
             CampaignDataGeneratorHelpers.DeleteOldActivities(campaignInfo.CampaignUTMCode);
-            var contactsIDs = new ContactsIdData(_mContactFirstNamePrefix, contactsCount);
+            var contactsIDs = new ContactsIdData(_contactEmailPostfix, contactsCount);
+
             CampaignDataGeneratorHelpers.GenerateActivities(conversionHits[ConversionPagevisitColombia], campaignInfo,
                 "pagevisit",
-                contactsIDs, document2.NodeID);
+                contactsIDs, colombiaPath.NodeID);
+
             CampaignDataGeneratorHelpers.GenerateActivities(conversionHits[ConversionPagevisitAmericasCoffeePoster],
                 campaignInfo,
-                "pagevisit", contactsIDs, document1.NodeID);
+                "pagevisit", contactsIDs, posterPath.NodeID);
+
             CampaignDataGeneratorHelpers.GenerateActivities(conversionHits[ConversionUserregistration], campaignInfo,
                 "userregistration", contactsIDs);
+
             CampaignDataGeneratorHelpers.GenerateActivities(conversionHits[ConversionFormsubmissionTryFreeSample],
                 campaignInfo,
                 "bizformsubmit", contactsIDs, bizFormInfo.FormID);
@@ -401,9 +407,10 @@ namespace DancingGoat.Generator.WebAnalytics
             };
         }
 
-        private IEnumerable<CampaignConversionData> PrepareCoffeeClubMembershipConversions()
+        private static IEnumerable<CampaignConversionData> PrepareCoffeeClubMembershipConversions()
         {
-            var document = CampaignDataGeneratorHelpers.GetDocument("/Products/Coffees/Ethiopia-Yirgacheffe");
+            var document = CampaignDataGeneratorHelpers.GetDocument(PagePathCoffeeClubMembership);
+            var coffeeclubmembershipdocument = CampaignDataGeneratorHelpers.GetDocument("/Products/Brewers/AeroPress");
             return new List<CampaignConversionData>
             {
                 new CampaignConversionData
@@ -411,7 +418,7 @@ namespace DancingGoat.Generator.WebAnalytics
                     ConversionName = "coffee_club_membership",
                     ConversionDisplayName = document.DocumentName,
                     ConversionActivityType = "purchasedproduct",
-                    ConversionItemId = document.NodeSKUID,
+                    ConversionItemId = coffeeclubmembershipdocument.NodeSKUID,
                     ConversionOrder = 1,
                     ConversionIsFunnelStep = false
                 },
@@ -429,7 +436,7 @@ namespace DancingGoat.Generator.WebAnalytics
                     ConversionName = "coffee_club_membership_2",
                     ConversionDisplayName = document.DocumentName,
                     ConversionActivityType = "productaddedtoshoppingcart",
-                    ConversionItemId = document.NodeSKUID,
+                    ConversionItemId = coffeeclubmembershipdocument.NodeSKUID,
                     ConversionOrder = 2,
                     ConversionIsFunnelStep = true
                 },
@@ -438,7 +445,7 @@ namespace DancingGoat.Generator.WebAnalytics
                     ConversionName = "coffee_club_membership_3",
                     ConversionDisplayName = document.DocumentName,
                     ConversionActivityType = "purchasedproduct",
-                    ConversionItemId = document.NodeSKUID,
+                    ConversionItemId = coffeeclubmembershipdocument.NodeSKUID,
                     ConversionOrder = 3,
                     ConversionIsFunnelStep = true
                 }

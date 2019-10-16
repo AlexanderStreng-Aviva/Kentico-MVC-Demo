@@ -9,6 +9,7 @@ namespace DancingGoat.Generator.WebAnalytics
     {
         private const string ContactGroupAllContactsWithEmail = "AllContactsWithEmail";
         private const string ContactGroupAllChicagoContactsWithEmail = "AllChicagoContactsWithEmail";
+
         private readonly SiteInfo _mSite;
 
         /// <summary>Constructor.</summary>

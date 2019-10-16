@@ -191,7 +191,7 @@ namespace DancingGoat.Controllers
             catch (Exception e)
             {
                 model.DisplayErrorMessage = true;
-                model.ErrorMessage = $"Exception occured. {e.Message}";
+                model.ErrorMessage = $"Exception occured. {e.Message} {Environment.NewLine} {e.StackTrace}";
             }
 
             return View("Index", model);

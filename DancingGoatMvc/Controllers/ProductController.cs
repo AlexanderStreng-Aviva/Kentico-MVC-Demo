@@ -100,7 +100,7 @@ namespace DancingGoat.Controllers
             var response = new
             {
                 totalPrice = String.Format(currency.CurrencyFormatString, priceDetail.Price),
-                beforeDiscount = discount > 0 ? String.Format(currency.CurrencyFormatString, beforeDiscount) : string.Empty,
+                beforeDiscount = discount > 0 ? string.Format(currency.CurrencyFormatString, beforeDiscount) : string.Empty,
                 savings = priceSavings,
                 stockMessage = ResHelper.GetString(stockMessageResourceString),
                 inStock,

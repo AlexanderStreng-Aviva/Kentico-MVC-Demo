@@ -17,7 +17,6 @@ using DancingGoat.Models.Generator;
 
 namespace DancingGoat.Controllers
 {
-    [Authorize]
     public class GeneratorController : Controller
     {
         private const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

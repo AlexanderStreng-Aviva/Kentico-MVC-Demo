@@ -6147,6 +6147,11 @@
             Metafile ID.
             </summary>
         </member>
+        <member name="P:CMS.Base.Web.UI.MediaSource.OriginalUrl">
+            <summary>
+            Gets or sets the original URL of this media source.
+            </summary>
+        </member>
         <member name="M:CMS.Base.Web.UI.MediaSource.#ctor">
             <summary>
             Constructor

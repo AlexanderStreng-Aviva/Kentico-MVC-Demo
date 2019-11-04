@@ -5367,6 +5367,12 @@
             which may or may not be created by hotfix SQL script.
             </summary>
         </member>
+        <member name="M:CMS.UIControls.HotfixProcedure.SetDefaultSearchSettingsForDocumentFields(System.Int32)">
+            <summary>
+            Sets Search settings for cms.document, fields DocumentContent and DocumentWebParts.
+            The new setting values follow previously hard-coded behavior.
+            </summary>
+        </member>
         <member name="T:CMS.UIControls.ContentInnerMediaView">
             <summary>
             Base class for inner media view for content dialog
@@ -5926,6 +5932,11 @@
             If node belongs to site different from current site, a presentation URL is returned (if presentation URL configuration is available). Otherwise, an absolute URL returned.
             </summary>
             <param name="node">Tree node to to find URL for.</param>
+        </member>
+        <member name="M:CMS.UIControls.ContentMediaView.OnInit(System.EventArgs)">
+            <summary>
+            Init event handler.
+            </summary>
         </member>
         <member name="M:CMS.UIControls.ContentMediaView.SetupControls">
             <summary>
